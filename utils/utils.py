@@ -402,13 +402,24 @@ def save_image(img_data, type_, seed, choose_game, choose_character, *args):
     Returns:
         saved_path (str): 保存路径
     """
+    choose_game = choose_game if choose_game not in (None, "", "None") else None
+    choose_character = choose_character if choose_character not in (None, "", "None") else None
+
     try:
         file_name: str = args[0]
         file_name = file_name.replace(".png", "")
         name_list = file_name.split("_")
-        choose_character = name_list[2]
+        if len(name_list) > 1 and not choose_game:
+            choose_game = name_list[1]
+        if len(name_list) > 2 and not choose_character:
+            choose_character = name_list[2]
     except Exception:
         pass
+
+    if choose_game in (None, "", "None"):
+        choose_game = None
+    if choose_character in (None, "", "None"):
+        choose_character = None
     if env.save_path == "默认(Default)":
         path = ""
     elif env.save_path == "日期(Date)":

@@ -1,19 +1,35 @@
-import os
+﻿import os
 import shutil
 import subprocess
 import sys
 
-from utils.env import env
+requirements_checked = False
+
+
+def install_requirements():
+    global requirements_checked
+    if requirements_checked:
+        return
+    requirements_checked = True
+    print('Detected missing dependencies, installing requirements...')
+    subprocess.call(f"{sys.executable} -s -m pip install -r requirements.txt")
+
 
 try:
-    os.remove("main.py")
+    from utils.env import env
+except ModuleNotFoundError:
+    install_requirements()
+    from utils.env import env
+
+try:
+    os.remove('main.py')
 except FileNotFoundError:
     pass
 
 if env.new_interface:
-    shutil.copyfile("./files/webui/main_new.py", "main.py")
+    shutil.copyfile('./files/webui/main_new.py', 'main.py')
 else:
-    shutil.copyfile("./files/webui/main_bak.py", "main.py")
+    shutil.copyfile('./files/webui/main_bak.py', 'main.py')
 
 
 try:
@@ -22,5 +38,4 @@ try:
     from src import *  # noqa
     from utils import *  # noqa
 except ModuleNotFoundError:
-    print("检测到是首次启动, 开始安装所需依赖...")
-    subprocess.call(f"{sys.executable} -s -m pip install -r requirements.txt")
+    install_requirements()
